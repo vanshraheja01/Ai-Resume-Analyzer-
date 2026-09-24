@@ -56,6 +56,21 @@ alembic revision --autogenerate -m "describe the change"
 alembic upgrade head
 ```
 
-Status: Phase 1 complete (models + migrations applied to a live Postgres).
-Auth, resume processing, AI analysis, matching, and application tracking land
-in later phases — see the root README for the roadmap.
+## Authentication
+
+- Passwords are hashed with `bcrypt` (`app/utils/security.py`) — never stored or logged in plain text.
+- Login issues a JWT (`app/services/auth_service.py::create_access_token`), signed with `JWT_SECRET_KEY`
+  and expiring after `ACCESS_TOKEN_EXPIRE_MINUTES`. The token's payload is just `{"sub": user_id, "exp": ...}` —
+  no sensitive data is embedded in it.
+- Protected routes depend on `auth_service.get_current_user`, which decodes the bearer token and loads the
+  user from the DB. FastAPI's dependency injection (`Depends(...)`) is what wires this into any route that
+  needs it — see `GET /api/auth/me` for the pattern to copy for future protected endpoints.
+- `POST /api/auth/login` uses FastAPI's `OAuth2PasswordRequestForm` (form-encoded `username`/`password`,
+  where `username` holds the email) specifically so the `/docs` Swagger UI's "Authorize" button works
+  out of the box for manual testing — the frontend can still call it as a normal form POST.
+- Auth is intentionally isolated in one service module: swapping to a different provider (e.g. Supabase
+  Auth, Clerk) later means changing `auth_service.py`, not every route that calls `get_current_user`.
+
+Status: Phase 2 complete (register, login, JWT, protected route). Resume
+processing, AI analysis, matching, and application tracking land in later
+phases — see the root README for the roadmap.

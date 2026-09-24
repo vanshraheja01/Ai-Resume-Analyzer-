@@ -16,6 +16,11 @@ class Settings(BaseSettings):
     # Database
     database_url: str = "postgresql+psycopg://resume_user:resume_pass@localhost:5432/resume_analyzer"
 
+    # Auth
+    jwt_secret_key: str = "dev-only-insecure-secret-change-me"
+    jwt_algorithm: str = "HS256"
+    access_token_expire_minutes: int = 60
+
     @property
     def cors_origin_list(self) -> list[str]:
         return [origin.strip() for origin in self.cors_origins.split(",") if origin.strip()]

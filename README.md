@@ -155,7 +155,7 @@ App: http://localhost:3000
 |---|---|
 | `DATABASE_URL` | Postgres connection string |
 | `CORS_ORIGINS` | Comma-separated allowed frontend origins |
-| `JWT_SECRET_KEY` | Signs auth tokens (Phase 2) |
+| `JWT_SECRET_KEY` | Signs auth tokens — generate your own, never reuse the example value |
 | `AI_MODE` | `mock` (no API key needed) or `live` (Phase 4) |
 | `AI_PROVIDER` | `gemini` (Phase 4) |
 | `GEMINI_API_KEY` | Only needed when `AI_MODE=live` |
@@ -174,7 +174,7 @@ App: http://localhost:3000
 |---|---|
 | 0 | ✅ Repo scaffolding, backend/frontend skeletons, docker-compose Postgres |
 | 1 | ✅ Database: SQLAlchemy models, Alembic migrations, applied to a live Postgres |
-| 2 | Auth: register/login/logout, JWT, password hashing |
+| 2 | ✅ Auth: register/login, JWT, bcrypt password hashing, protected `/me` route |
 | 3 | Resume upload + parser (PyMuPDF/python-docx), storage abstraction |
 | 4 | AI resume analysis (provider abstraction + mock mode) |
 | 5 | Job description analyzer + resume-job matching engine |

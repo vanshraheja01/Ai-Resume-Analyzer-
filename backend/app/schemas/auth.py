@@ -1,0 +1,32 @@
+import uuid
+
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
+
+
+class UserRegister(BaseModel):
+    email: EmailStr
+    password: str = Field(min_length=8, max_length=128)
+    full_name: str | None = Field(default=None, max_length=255)
+
+
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
+
+
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+
+
+class UserResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    email: EmailStr
+    full_name: str | None
+    location: str | None
+    github_url: str | None
+    linkedin_url: str | None
+    portfolio_url: str | None
+    preferred_role: str | None
