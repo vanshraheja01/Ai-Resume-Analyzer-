@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 from app.config import get_settings
 from app.database.connection import get_db
 from app.models.user import User
-from app.schemas.auth import UserRegister
+from app.schemas.auth import UserRegister, UserUpdate
 from app.utils.security import hash_password, verify_password
 
 settings = get_settings()
@@ -55,6 +55,14 @@ def authenticate_user(db: Session, email: str, password: str) -> User:
             "Incorrect email or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
+    return user
+
+
+def update_user_profile(db: Session, user: User, data: UserUpdate) -> User:
+    for field, value in data.model_dump().items():
+        setattr(user, field, value)
+    db.commit()
+    db.refresh(user)
     return user
 
 

@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 
 from app.database.connection import get_db
 from app.models.user import User
-from app.schemas.auth import TokenResponse, UserRegister, UserResponse
+from app.schemas.auth import TokenResponse, UserRegister, UserResponse, UserUpdate
 from app.services import auth_service
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
@@ -26,3 +26,12 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
 @router.get("/me", response_model=UserResponse)
 def get_me(current_user: User = Depends(auth_service.get_current_user)) -> User:
     return current_user
+
+
+@router.put("/me", response_model=UserResponse)
+def update_me(
+    data: UserUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(auth_service.get_current_user),
+) -> User:
+    return auth_service.update_user_profile(db, current_user, data)

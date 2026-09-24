@@ -8,10 +8,18 @@ Built as a BTech 4th-year Computer Science portfolio project to demonstrate
 frontend, backend, database, auth, NLP/document processing, AI integration,
 and clean software architecture end to end.
 
-> **Status: Phase 0 (scaffolding) complete.** Database, auth, resume
-> processing, AI analysis, matching, and application tracking land in the
-> phases below — this README's feature list describes the target state, not
-> what's implemented yet.
+> **Status: Phases 0-8 complete** — database, auth, resume upload/parsing, AI
+> analysis, job matching, application tracking, and the full frontend are
+> implemented and verified end-to-end (backend: 25/25 automated tests +
+> live-API verification; frontend: real browser testing of every flow). Only
+> Phase 9 (formal frontend tests) and Phase 10 (final docs polish) remain —
+> see the roadmap below.
+
+## Screenshots
+
+_Placeholder — add screenshots of the landing page, dashboard, resume
+analysis view, and application tracker here before sharing this project
+publicly._
 
 ## Tech stack
 
@@ -50,6 +58,13 @@ interaction goes through the FastAPI REST API over JSON, authenticated with
 a JWT bearer token. The AI provider and storage backend are both hidden
 behind interfaces (`app/services/ai_service.py`, `app/services/storage_service.py`)
 so either can be swapped without touching route or business logic.
+
+Concretely: `frontend/lib/api.ts` is a single typed `fetch` wrapper — every
+page calls a function like `resumesApi.upload(...)` or `dashboardApi.get()`
+rather than constructing requests inline, and the wrapper attaches the JWT
+(stored in `localStorage`) as an `Authorization: Bearer` header automatically.
+See [frontend/README.md](frontend/README.md#how-it-talks-to-the-backend) for
+the full request/error-handling flow.
 
 ## Folder structure
 
@@ -183,8 +198,8 @@ App: http://localhost:3000
 | 4 | ✅ AI resume analysis (Gemini + mock provider abstraction) |
 | 5 | ✅ Job description analyzer + resume-job matching engine |
 | 6 | ✅ Application tracker + dashboard stats |
-| 7 | Frontend build-out, wired to the real API |
-| 8 | Polish: loaders, empty/error states, responsive pass |
+| 7 | ✅ Frontend build-out, wired to the real API |
+| 8 | ✅ Polish: loaders, empty/error states, toasts, confirm dialogs, responsive layout (built alongside Phase 7, not bolted on after) |
 | 9 | Tests (backend + frontend) |
 | 10 | Documentation pass |
 

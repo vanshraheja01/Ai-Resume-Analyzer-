@@ -14,6 +14,15 @@ class UserLogin(BaseModel):
     password: str
 
 
+class UserUpdate(BaseModel):
+    full_name: str | None = Field(default=None, max_length=255)
+    location: str | None = Field(default=None, max_length=255)
+    github_url: str | None = Field(default=None, max_length=500)
+    linkedin_url: str | None = Field(default=None, max_length=500)
+    portfolio_url: str | None = Field(default=None, max_length=500)
+    preferred_role: str | None = Field(default=None, max_length=255)
+
+
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"

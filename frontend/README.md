@@ -1,36 +1,54 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Frontend — AI Resume Analyzer
 
-## Getting Started
+Next.js (App Router) + TypeScript + Tailwind CSS. See the root [README.md](../README.md) for the full project overview.
 
-First, run the development server:
+## Local setup
 
 ```bash
+npm install
+cp .env.local.example .env.local
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+App: http://localhost:3000 — requires the backend running at the URL in `NEXT_PUBLIC_API_URL` (default `http://localhost:8000`).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## How it talks to the backend
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Every API call goes through `lib/api.ts` — a thin typed wrapper around `fetch`, one function per backend endpoint (`authApi`, `resumesApi`, `jobsApi`, `matchingApi`, `applicationsApi`, `dashboardApi`). No component calls `fetch` directly. Auth is a JWT stored in `localStorage`, attached as `Authorization: Bearer <token>` by `request()`; `lib/auth.tsx` (`AuthProvider`/`useAuth`/`useRequireAuth`) tracks the current user and redirects unauthenticated visitors to `/login`. Errors from the API surface as `ApiError` with the backend's `detail` message, so every page can show the real reason a request failed instead of a generic error.
 
-## Learn More
+Dynamic routes (`/resumes/[id]`, `/jobs/[id]`) follow the Next.js 16 pattern: `page.tsx` is an async Server Component that awaits `props.params`, then renders a co-located `*-client.tsx` Client Component that does the actual data fetching/interactivity — this is required because `params` is a Promise in Next 16, and Client Components can't `await` directly in their function signature.
 
-To learn more about Next.js, take a look at the following resources:
+## Structure
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+app/                    # Routes (App Router)
+├── page.tsx             # Landing page
+├── login/, register/    # Auth
+├── dashboard/           # Stats overview
+├── resumes/             # List, upload, detail + AI analysis
+├── jobs/                # List, analyze, detail + matching
+├── applications/        # Tracker (grouped by status)
+└── profile/             # Editable user profile
+components/
+├── ui/                   # Button, Input, Card, Badge, Toast, Dialog, states
+├── layout/               # AppShell (sidebar nav + auth gate)
+├── dashboard/            # StatCard, ScoreBar
+├── resume/               # Upload form, card, analysis panel
+├── jobs/                 # Job form, card, match result panel
+└── applications/         # Application form, card
+lib/
+├── api.ts                # Typed fetch client (source of truth for endpoints)
+├── auth.tsx              # Auth context + hooks
+└── utils.ts               # cn(), formatDate, score color helpers, status labels
+types/                    # TypeScript interfaces mirroring backend Pydantic schemas
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Notes for interview explainability
 
-## Deploy on Vercel
+- **State management**: no Redux/Zustand — React context (`AuthProvider`) for auth, local `useState`/`useEffect` per page for data fetching. Justified by scope: this app has one piece of cross-cutting state (the logged-in user); adding a global store for page-local resume/job/application lists would be premature.
+- **Why a JWT in `localStorage` instead of an httpOnly cookie**: simpler to reason about for a portfolio project talking to a separate FastAPI origin, at the cost of XSS exposure a cookie-based session would avoid — a real production app would prefer httpOnly cookies + CSRF protection.
+- **Partial updates**: the applications tracker's status dropdown calls `PUT /api/applications/{id}` with only `{ status }` — the backend treats `PUT` as a deliberate partial update (see backend README) so this doesn't require resending the whole record.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Status: Phase 7 complete — all pages wired to the live backend, verified via
+real browser interaction (register, dashboard, job analysis, matching,
+application tracking, profile editing all confirmed end-to-end).
