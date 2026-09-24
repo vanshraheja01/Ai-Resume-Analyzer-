@@ -13,8 +13,8 @@ class Settings(BaseSettings):
     environment: str = "development"
     cors_origins: str = "http://localhost:3000"
 
-    # Database (added in Phase 1)
-    database_url: str = "postgresql://resume_user:resume_pass@localhost:5432/resume_analyzer"
+    # Database
+    database_url: str = "postgresql+psycopg://resume_user:resume_pass@localhost:5432/resume_analyzer"
 
     @property
     def cors_origin_list(self) -> list[str]:
