@@ -6,9 +6,10 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.config import get_settings
-from app.models.resume import Resume
+from app.models.resume import Resume, ResumeAnalysis
 from app.models.user import User
 from app.services import resume_parser
+from app.services.ai_service import AIProviderError, get_ai_provider
 from app.services.storage_service import get_storage_backend
 
 ALLOWED_EXTENSIONS = {".pdf": "pdf", ".docx": "docx"}
@@ -87,3 +88,43 @@ def delete_resume(db: Session, user: User, resume_id: uuid.UUID) -> None:
     get_storage_backend().delete(resume.file_path)
     db.delete(resume)
     db.commit()
+
+
+def analyze_resume(db: Session, resume: Resume) -> ResumeAnalysis:
+    settings = get_settings()
+    provider = get_ai_provider()
+
+    try:
+        result = provider.analyze_resume(resume.parsed_data or {}, resume.raw_text or "")
+    except AIProviderError as exc:
+        raise HTTPException(status.HTTP_502_BAD_GATEWAY, f"AI analysis failed: {exc}") from exc
+
+    analysis = ResumeAnalysis(
+        resume_id=resume.id,
+        overall_score=result.overall_score,
+        skills_score=result.skills_score,
+        experience_score=result.experience_score,
+        projects_score=result.projects_score,
+        education_score=result.education_score,
+        structure_score=result.structure_score,
+        job_relevance_score=result.job_relevance_score,
+        achievements_score=result.achievements_score,
+        keywords_score=result.keywords_score,
+        strengths=result.strengths,
+        weaknesses=result.weaknesses,
+        recommendations=result.recommendations,
+        ai_provider_used=settings.ai_provider if settings.ai_mode == "live" else "mock",
+    )
+    db.add(analysis)
+    db.commit()
+    db.refresh(analysis)
+    return analysis
+
+
+def list_analyses(db: Session, resume: Resume) -> list[ResumeAnalysis]:
+    stmt = (
+        select(ResumeAnalysis)
+        .where(ResumeAnalysis.resume_id == resume.id)
+        .order_by(ResumeAnalysis.created_at.desc())
+    )
+    return list(db.scalars(stmt))

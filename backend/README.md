@@ -90,6 +90,23 @@ alembic upgrade head
   checks `resume.user_id == user.id` before returning/deleting anything — accessing another user's
   resume returns `404`, not `403`, so it doesn't even leak that the resume exists.
 
-Status: Phase 3 complete (upload, storage abstraction, parsing, full CRUD,
-ownership checks). AI analysis, matching, and application tracking land in
-later phases — see the root README for the roadmap.
+## AI resume analysis
+
+- **Provider abstraction** (`app/services/ai_service.py`): `AIProvider` is the only interface routes/
+  services talk to. `MockAIProvider` scores content-aware but heuristic results with zero external
+  calls — the default, so the app runs with no API key. `GeminiAIProvider` calls the real Gemini API
+  via `google-genai`, requesting a strict JSON response and retrying once before giving up.
+- **Validation**: both providers return `ResumeAnalysisResult` (`app/schemas/ai.py`), a Pydantic model
+  with `ge=0, le=100` score bounds. A Gemini response that doesn't parse as valid JSON or doesn't fit
+  the schema is never passed through — it raises `AIProviderError`, which `POST /api/resumes/{id}/analyze`
+  turns into a `502` with a clear message instead of corrupting a DB row or crashing.
+- **History, not overwrite**: each analysis run inserts a new `resume_analyses` row rather than
+  updating one in place, so `GET /api/resumes/{id}/analyses` can show score progress over time — a
+  resume improving after edits is exactly the story this project is meant to tell.
+- **Switching providers**: change `AI_MODE`/`AI_PROVIDER`/`GEMINI_API_KEY` in `.env` — no code changes.
+  Adding a second real provider (e.g. OpenAI) means one new `AIProvider` subclass and one branch in
+  `get_ai_provider()`.
+
+Status: Phase 4 complete (AI provider abstraction, mock + Gemini, validated
+scoring, history). Job matching and application tracking land in later
+phases — see the root README for the roadmap.

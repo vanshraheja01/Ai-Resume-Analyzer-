@@ -26,6 +26,12 @@ class Settings(BaseSettings):
     local_storage_path: str = "./storage/uploads"
     max_upload_size_mb: int = 5
 
+    # AI
+    ai_mode: str = "mock"  # "mock" | "live"
+    ai_provider: str = "gemini"
+    gemini_api_key: str | None = None
+    gemini_model: str = "gemini-2.0-flash"
+
     @property
     def cors_origin_list(self) -> list[str]:
         return [origin.strip() for origin in self.cors_origins.split(",") if origin.strip()]

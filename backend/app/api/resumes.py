@@ -4,9 +4,9 @@ from fastapi import APIRouter, Depends, File, Form, UploadFile, status
 from sqlalchemy.orm import Session
 
 from app.database.connection import get_db
-from app.models.resume import Resume
+from app.models.resume import Resume, ResumeAnalysis
 from app.models.user import User
-from app.schemas.resume import ResumeDetail, ResumeSummary
+from app.schemas.resume import ResumeAnalysisResponse, ResumeDetail, ResumeSummary
 from app.services import auth_service, resume_service
 
 router = APIRouter(prefix="/api/resumes", tags=["resumes"])
@@ -46,3 +46,23 @@ def delete_resume(
     current_user: User = Depends(auth_service.get_current_user),
 ) -> None:
     resume_service.delete_resume(db, current_user, resume_id)
+
+
+@router.post("/{resume_id}/analyze", response_model=ResumeAnalysisResponse, status_code=status.HTTP_201_CREATED)
+def analyze_resume(
+    resume_id: uuid.UUID,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(auth_service.get_current_user),
+) -> ResumeAnalysis:
+    resume = resume_service.get_resume(db, current_user, resume_id)
+    return resume_service.analyze_resume(db, resume)
+
+
+@router.get("/{resume_id}/analyses", response_model=list[ResumeAnalysisResponse])
+def list_resume_analyses(
+    resume_id: uuid.UUID,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(auth_service.get_current_user),
+) -> list[ResumeAnalysis]:
+    resume = resume_service.get_resume(db, current_user, resume_id)
+    return resume_service.list_analyses(db, resume)

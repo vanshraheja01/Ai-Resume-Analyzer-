@@ -159,9 +159,10 @@ App: http://localhost:3000
 | `STORAGE_BACKEND` | `local` (only option currently implemented) |
 | `LOCAL_STORAGE_PATH` | Where uploaded resumes are stored on disk |
 | `MAX_UPLOAD_SIZE_MB` | Upload size limit, enforced server-side |
-| `AI_MODE` | `mock` (no API key needed) or `live` (Phase 4) |
-| `AI_PROVIDER` | `gemini` (Phase 4) |
+| `AI_MODE` | `mock` (no API key needed, default) or `live` |
+| `AI_PROVIDER` | `gemini` |
 | `GEMINI_API_KEY` | Only needed when `AI_MODE=live` |
+| `GEMINI_MODEL` | Gemini model name, e.g. `gemini-2.0-flash` |
 
 **Frontend** (`frontend/.env.local`, see `frontend/.env.local.example`):
 
@@ -179,7 +180,7 @@ App: http://localhost:3000
 | 1 | ✅ Database: SQLAlchemy models, Alembic migrations, applied to a live Postgres |
 | 2 | ✅ Auth: register/login, JWT, bcrypt password hashing, protected `/me` route |
 | 3 | ✅ Resume upload + parser (PyMuPDF/python-docx), storage abstraction |
-| 4 | AI resume analysis (provider abstraction + mock mode) |
+| 4 | ✅ AI resume analysis (Gemini + mock provider abstraction) |
 | 5 | Job description analyzer + resume-job matching engine |
 | 6 | Application tracker + stats |
 | 7 | Frontend build-out, wired to the real API |
@@ -194,17 +195,21 @@ without touching any route or business logic:
 
 ```python
 class AIProvider(ABC):
-    def analyze_resume(self, resume_data: dict) -> ResumeAnalysis: ...
-    def analyze_job(self, job_description: str) -> JobAnalysis: ...
-    def match_resume_job(self, resume: dict, job: dict) -> MatchResult: ...
-    def improve_resume(self, resume_data: dict) -> ImprovementSuggestions: ...
+    def analyze_resume(self, parsed_data: dict, raw_text: str) -> ResumeAnalysisResult: ...
+    # analyze_job / match_resume_job / improve_resume land with Phases 5 and 13
 ```
 
-`AI_MODE=mock` returns deterministic, realistic sample data with zero API
-calls — the whole app runs and is demoable without any API key.
-`AI_MODE=live` with `AI_PROVIDER=gemini` calls the real Gemini API. Every AI
-response is validated against a Pydantic schema before it reaches the
-database or the frontend; malformed model output never propagates as-is.
+`AI_MODE=mock` (`MockAIProvider`) returns deterministic, content-aware scores
+with zero API calls — more skills/experience/projects genuinely score higher,
+so it behaves like a real (if simple) reviewer rather than random numbers.
+The whole app runs and is demoable without any API key.
+
+`AI_MODE=live` with `AI_PROVIDER=gemini` (`GeminiAIProvider`) calls the real
+Gemini API, asking for a strict JSON response and retrying once on a
+malformed reply. Every response — mock or live — is validated against the
+same `ResumeAnalysisResult` Pydantic schema before it's stored or returned;
+a response that doesn't fit raises `AIProviderError`, which the API layer
+turns into a clean `502` rather than a crash or a corrupted DB row.
 
 ## Future improvements
 
