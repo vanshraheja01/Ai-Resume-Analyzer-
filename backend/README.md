@@ -71,6 +71,25 @@ alembic upgrade head
 - Auth is intentionally isolated in one service module: swapping to a different provider (e.g. Supabase
   Auth, Clerk) later means changing `auth_service.py`, not every route that calls `get_current_user`.
 
-Status: Phase 2 complete (register, login, JWT, protected route). Resume
-processing, AI analysis, matching, and application tracking land in later
-phases — see the root README for the roadmap.
+## Resume upload & parsing
+
+- **Storage abstraction** (`app/services/storage_service.py`): routes/services only ever call
+  `StorageBackend.save/get_path/delete`. `LocalStorageBackend` writes to `storage/uploads/` today;
+  swapping to S3/Supabase later means adding one class and changing `get_storage_backend()` — no
+  route or service code changes.
+- **Parsing** (`app/services/resume_parser.py`): `PyMuPDF` extracts text from PDFs, `python-docx`
+  from Word docs. Structured fields (name, email, phone, location, education, skills, experience,
+  projects, certifications, achievements, languages, links) are pulled out with regex + section-header
+  heuristics — this is classic NLP, not AI; it's what feeds the AI analysis layer in Phase 4, not a
+  replacement for it. It's resilient to varied layouts but not perfect (an unusually-formatted resume
+  may leave some fields empty) — a fair, disclosed limitation for a heuristic parser.
+- **Validation**: `POST /api/resumes/upload` rejects non-PDF/DOCX files and anything over
+  `MAX_UPLOAD_SIZE_MB` before touching storage. A corrupted/unreadable file returns a clean `422`
+  instead of a stack trace — parsing failures never crash the request.
+- **Ownership**: every resume route is behind `auth_service.get_current_user`, and `resume_service`
+  checks `resume.user_id == user.id` before returning/deleting anything — accessing another user's
+  resume returns `404`, not `403`, so it doesn't even leak that the resume exists.
+
+Status: Phase 3 complete (upload, storage abstraction, parsing, full CRUD,
+ownership checks). AI analysis, matching, and application tracking land in
+later phases — see the root README for the roadmap.

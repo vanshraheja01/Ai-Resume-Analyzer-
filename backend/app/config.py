@@ -21,6 +21,11 @@ class Settings(BaseSettings):
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 60
 
+    # Storage
+    storage_backend: str = "local"
+    local_storage_path: str = "./storage/uploads"
+    max_upload_size_mb: int = 5
+
     @property
     def cors_origin_list(self) -> list[str]:
         return [origin.strip() for origin in self.cors_origins.split(",") if origin.strip()]

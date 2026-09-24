@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import auth
+from app.api import auth, resumes
 from app.config import get_settings
 
 settings = get_settings()
@@ -21,6 +21,7 @@ app.add_middleware(
 )
 
 app.include_router(auth.router)
+app.include_router(resumes.router)
 
 
 @app.get("/")
