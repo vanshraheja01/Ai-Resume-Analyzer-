@@ -107,6 +107,26 @@ alembic upgrade head
   Adding a second real provider (e.g. OpenAI) means one new `AIProvider` subclass and one branch in
   `get_ai_provider()`.
 
-Status: Phase 4 complete (AI provider abstraction, mock + Gemini, validated
-scoring, history). Job matching and application tracking land in later
-phases — see the root README for the roadmap.
+## Job analysis & resume-job matching
+
+- **Job analysis** (`POST /api/jobs/analyze`): pastes a job description in, `AIProvider.analyze_job`
+  extracts required/preferred skills, minimum experience, education requirements, tools, and keywords,
+  stored as `Job.extracted_data`. `MockAIProvider` does this by scanning a curated tech-keyword list
+  and splitting on a detected "preferred/nice-to-have" section — a real heuristic, not random.
+- **Keyword matching pitfall (and the fix)**: naive substring checks (`"sql" in "postgresql"`,
+  `"java" in "javascript"`) produce false positives — both are true! `_contains_keyword()` uses
+  alphanumeric-adjacency lookarounds instead of `\b` (which itself breaks on symbol-heavy keywords
+  like `C++` or `CI/CD`), so short keywords only match as whole words. Covered by
+  `tests/test_matching.py`.
+- **Matching** (`POST /api/matching/analyze`): compares a resume's parsed skills against a job's
+  extracted skills via `AIProvider.match_resume_job`, producing `matched_skills` / `missing_skills` /
+  `partial_skills` (e.g. resume has "Node", job wants "Node.js") plus targeted recommendations.
+- **Upsert, not duplicate**: `matches` has a unique constraint on `(resume_id, job_id)` — re-running a
+  match on the same pair updates the existing row rather than creating a new one, since a match score
+  should reflect the current resume/job state, not accumulate history like resume analyses do.
+- Both endpoints reuse `resume_service.get_resume` / `job_service.get_job` for ownership checks, so a
+  match can only ever be created between one user's own resume and their own job description.
+
+Status: Phase 5 complete (job analysis, matching engine, upsert semantics).
+Application tracking and the frontend land in later phases — see the root
+README for the roadmap.

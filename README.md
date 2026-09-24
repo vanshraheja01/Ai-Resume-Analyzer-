@@ -181,7 +181,7 @@ App: http://localhost:3000
 | 2 | ✅ Auth: register/login, JWT, bcrypt password hashing, protected `/me` route |
 | 3 | ✅ Resume upload + parser (PyMuPDF/python-docx), storage abstraction |
 | 4 | ✅ AI resume analysis (Gemini + mock provider abstraction) |
-| 5 | Job description analyzer + resume-job matching engine |
+| 5 | ✅ Job description analyzer + resume-job matching engine |
 | 6 | Application tracker + stats |
 | 7 | Frontend build-out, wired to the real API |
 | 8 | Polish: loaders, empty/error states, responsive pass |
@@ -196,7 +196,9 @@ without touching any route or business logic:
 ```python
 class AIProvider(ABC):
     def analyze_resume(self, parsed_data: dict, raw_text: str) -> ResumeAnalysisResult: ...
-    # analyze_job / match_resume_job / improve_resume land with Phases 5 and 13
+    def analyze_job(self, job_description: str) -> JobAnalysisResult: ...
+    def match_resume_job(self, resume_data: dict, job_data: dict) -> MatchResult: ...
+    # improve_resume lands with Phase 13
 ```
 
 `AI_MODE=mock` (`MockAIProvider`) returns deterministic, content-aware scores

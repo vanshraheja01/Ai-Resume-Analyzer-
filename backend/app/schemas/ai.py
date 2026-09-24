@@ -20,3 +20,20 @@ class ResumeAnalysisResult(BaseModel):
     strengths: list[str] = Field(default_factory=list, max_length=10)
     weaknesses: list[str] = Field(default_factory=list, max_length=10)
     recommendations: list[str] = Field(default_factory=list, max_length=10)
+
+
+class JobAnalysisResult(BaseModel):
+    required_skills: list[str] = Field(default_factory=list, max_length=30)
+    preferred_skills: list[str] = Field(default_factory=list, max_length=30)
+    min_experience_years: int | None = Field(default=None, ge=0, le=50)
+    education_requirements: list[str] = Field(default_factory=list, max_length=10)
+    tools_technologies: list[str] = Field(default_factory=list, max_length=30)
+    keywords: list[str] = Field(default_factory=list, max_length=30)
+
+
+class MatchResult(BaseModel):
+    match_score: int = SCORE_FIELD
+    matched_skills: list[str] = Field(default_factory=list, max_length=30)
+    missing_skills: list[str] = Field(default_factory=list, max_length=30)
+    partial_skills: list[str] = Field(default_factory=list, max_length=30)
+    recommendations: list[str] = Field(default_factory=list, max_length=10)
