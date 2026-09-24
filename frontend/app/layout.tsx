@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AI Resume Analyzer",
+  title: "AI Resume Analyzer | Vansh Raheja",
   description: "AI-powered resume analysis, job matching, and application tracking.",
 };
 

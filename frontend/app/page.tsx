@@ -33,6 +33,11 @@ export default function LandingPage() {
             AI Resume Analyzer
           </div>
           <div className="flex items-center gap-3">
+            <Link href="/about">
+              <Button variant="ghost" size="sm">
+                About Me
+              </Button>
+            </Link>
             <Link href="/login">
               <Button variant="ghost" size="sm">
                 Log in
