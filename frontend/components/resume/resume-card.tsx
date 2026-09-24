@@ -1,16 +1,16 @@
 import Link from "next/link";
 import { FileText, Trash2 } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { InteractiveCard, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/utils";
 import type { ResumeSummary } from "@/types";
 
 export function ResumeCard({ resume, onDelete }: { resume: ResumeSummary; onDelete: () => void }) {
   return (
-    <Card className="transition-shadow hover:shadow-md">
+    <InteractiveCard className="group">
       <CardContent className="flex items-start justify-between gap-3">
         <Link href={`/resumes/${resume.id}`} className="flex flex-1 items-start gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary transition-transform duration-300 group-hover:scale-110">
             <FileText className="h-5 w-5" />
           </div>
           <div className="min-w-0 flex-1">
@@ -24,14 +24,15 @@ export function ResumeCard({ resume, onDelete }: { resume: ResumeSummary; onDele
         <button
           onClick={(e) => {
             e.preventDefault();
+            e.stopPropagation();
             onDelete();
           }}
-          className="shrink-0 rounded-lg p-2 text-muted-foreground hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950"
+          className="press-feedback shrink-0 rounded-lg p-2 text-muted-foreground transition-colors hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950"
           aria-label="Delete resume"
         >
           <Trash2 className="h-4 w-4" />
         </button>
       </CardContent>
-    </Card>
+    </InteractiveCard>
   );
 }

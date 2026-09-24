@@ -4,7 +4,24 @@ import { cn } from "@/lib/utils";
 export function Card({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={cn("rounded-xl border border-border bg-card text-card-foreground shadow-sm", className)}
+      className={cn(
+        "rounded-xl border border-border bg-card text-card-foreground shadow-sm",
+        "transition-[transform,box-shadow] duration-300 ease-out",
+        className
+      )}
+      {...props}
+    />
+  );
+}
+
+/** Same as Card, plus a lift-on-hover/press affordance for clickable cards (links, list items). */
+export function InteractiveCard({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
+  return (
+    <Card
+      className={cn(
+        "press-feedback cursor-pointer hover:-translate-y-1 hover:shadow-lg hover:border-primary/30",
+        className
+      )}
       {...props}
     />
   );

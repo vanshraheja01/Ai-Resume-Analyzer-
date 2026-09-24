@@ -16,7 +16,7 @@ export function ApplicationCard({
   onDelete: () => void;
 }) {
   return (
-    <Card>
+    <Card className="hover:shadow-md">
       <CardContent className="space-y-3">
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
@@ -24,12 +24,16 @@ export function ApplicationCard({
             <p className="truncate text-sm text-muted-foreground">{application.company}</p>
           </div>
           <div className="flex shrink-0 gap-1">
-            <button onClick={onEdit} className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted" aria-label="Edit">
+            <button
+              onClick={onEdit}
+              className="press-feedback rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-muted"
+              aria-label="Edit"
+            >
               <Pencil className="h-3.5 w-3.5" />
             </button>
             <button
               onClick={onDelete}
-              className="rounded-lg p-1.5 text-muted-foreground hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950"
+              className="press-feedback rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950"
               aria-label="Delete"
             >
               <Trash2 className="h-3.5 w-3.5" />

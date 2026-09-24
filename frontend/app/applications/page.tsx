@@ -8,6 +8,7 @@ import { ApplicationForm } from "@/components/applications/application-form";
 import { Button } from "@/components/ui/button";
 import { EmptyState, ErrorState, PageSpinner, Skeleton } from "@/components/ui/states";
 import { Modal, ConfirmDialog } from "@/components/ui/dialog";
+import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { useRequireAuth } from "@/lib/auth";
 import { applicationsApi, ApiError, type ApplicationInput } from "@/lib/api";
 import { useToast } from "@/components/ui/toast";
@@ -133,14 +134,15 @@ export default function ApplicationsPage() {
                   {APPLICATION_STATUS_LABELS[group.status]} ({group.items.length})
                 </h2>
                 <div className="space-y-3">
-                  {group.items.map((app) => (
-                    <ApplicationCard
-                      key={app.id}
-                      application={app}
-                      onStatusChange={(status) => handleStatusChange(app, status)}
-                      onEdit={() => setEditing(app)}
-                      onDelete={() => setDeleteTarget(app)}
-                    />
+                  {group.items.map((app, i) => (
+                    <ScrollReveal key={app.id} index={i}>
+                      <ApplicationCard
+                        application={app}
+                        onStatusChange={(status) => handleStatusChange(app, status)}
+                        onEdit={() => setEditing(app)}
+                        onDelete={() => setDeleteTarget(app)}
+                      />
+                    </ScrollReveal>
                   ))}
                 </div>
               </div>

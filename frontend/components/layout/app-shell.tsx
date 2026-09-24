@@ -46,10 +46,10 @@ export function AppShell({ children }: { children: ReactNode }) {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                  "press-feedback flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200",
                   active
-                    ? "bg-primary/10 text-primary"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                    ? "bg-primary/10 text-primary translate-x-0.5"
+                    : "text-muted-foreground hover:bg-muted hover:text-foreground hover:translate-x-0.5"
                 )}
               >
                 <item.icon className="h-4 w-4" />
@@ -62,7 +62,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <div className="mb-2 truncate px-3 text-xs text-muted-foreground">{user.email}</div>
           <button
             onClick={logout}
-            className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
+            className="press-feedback flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           >
             <LogOut className="h-4 w-4" />
             Log out
@@ -76,7 +76,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <Sparkles className="h-5 w-5 text-primary" />
             <span className="font-semibold">Resume Analyzer</span>
           </div>
-          <button onClick={logout} className="text-sm text-muted-foreground">
+          <button onClick={logout} className="press-feedback text-sm text-muted-foreground">
             Log out
           </button>
         </header>
@@ -88,7 +88,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "flex shrink-0 items-center gap-1.5 px-4 py-2.5 text-xs font-medium",
+                  "press-feedback flex shrink-0 items-center gap-1.5 px-4 py-2.5 text-xs font-medium transition-colors duration-200",
                   active ? "text-primary border-b-2 border-primary" : "text-muted-foreground"
                 )}
               >

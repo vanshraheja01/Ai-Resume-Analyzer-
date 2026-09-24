@@ -8,6 +8,7 @@ import { ResumeCard } from "@/components/resume/resume-card";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyState, ErrorState, PageSpinner, Skeleton } from "@/components/ui/states";
 import { ConfirmDialog } from "@/components/ui/dialog";
+import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { useRequireAuth } from "@/lib/auth";
 import { resumesApi, ApiError } from "@/lib/api";
 import { useToast } from "@/components/ui/toast";
@@ -86,8 +87,10 @@ export default function ResumesPage() {
 
         {resumes && resumes.length > 0 && (
           <div className="grid gap-3 sm:grid-cols-2">
-            {resumes.map((resume) => (
-              <ResumeCard key={resume.id} resume={resume} onDelete={() => setDeleteTarget(resume)} />
+            {resumes.map((resume, i) => (
+              <ScrollReveal key={resume.id} index={i}>
+                <ResumeCard resume={resume} onDelete={() => setDeleteTarget(resume)} />
+              </ScrollReveal>
             ))}
           </div>
         )}

@@ -8,6 +8,7 @@ import { JobCard } from "@/components/jobs/job-card";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyState, ErrorState, PageSpinner, Skeleton } from "@/components/ui/states";
 import { ConfirmDialog } from "@/components/ui/dialog";
+import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { useRequireAuth } from "@/lib/auth";
 import { jobsApi, ApiError } from "@/lib/api";
 import { useToast } from "@/components/ui/toast";
@@ -85,8 +86,10 @@ export default function JobsPage() {
 
         {jobs && jobs.length > 0 && (
           <div className="grid gap-3 sm:grid-cols-2">
-            {jobs.map((job) => (
-              <JobCard key={job.id} job={job} onDelete={() => setDeleteTarget(job)} />
+            {jobs.map((job, i) => (
+              <ScrollReveal key={job.id} index={i}>
+                <JobCard job={job} onDelete={() => setDeleteTarget(job)} />
+              </ScrollReveal>
             ))}
           </div>
         )}
