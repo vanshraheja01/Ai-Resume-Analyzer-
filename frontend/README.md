@@ -12,7 +12,20 @@ npm run dev
 
 App: http://localhost:3000 — requires the backend running at the URL in `NEXT_PUBLIC_API_URL` (default `http://localhost:8000`).
 
-## How it talks to the backend
+## Testing
+
+```bash
+npm run test
+```
+
+Vitest + React Testing Library, jsdom environment. Covers pure logic
+(`lib/utils.ts`: date formatting, score-color thresholds, status labels) and
+component behavior (`ScoreBar`'s width-from-score math including clamping,
+`Button`'s loading/disabled states). Kept intentionally modest — this is
+"tests where practical" per the spec, not exhaustive coverage; the bulk of
+functional verification for this app happened via real browser testing
+against the live backend during development (file upload especially can't
+be driven by the same automated tools, so that path is manually verified).
 
 Every API call goes through `lib/api.ts` — a thin typed wrapper around `fetch`, one function per backend endpoint (`authApi`, `resumesApi`, `jobsApi`, `matchingApi`, `applicationsApi`, `dashboardApi`). No component calls `fetch` directly. Auth is a JWT stored in `localStorage`, attached as `Authorization: Bearer <token>` by `request()`; `lib/auth.tsx` (`AuthProvider`/`useAuth`/`useRequireAuth`) tracks the current user and redirects unauthenticated visitors to `/login`. Errors from the API surface as `ApiError` with the backend's `detail` message, so every page can show the real reason a request failed instead of a generic error.
 
@@ -49,6 +62,5 @@ types/                    # TypeScript interfaces mirroring backend Pydantic sch
 - **Why a JWT in `localStorage` instead of an httpOnly cookie**: simpler to reason about for a portfolio project talking to a separate FastAPI origin, at the cost of XSS exposure a cookie-based session would avoid — a real production app would prefer httpOnly cookies + CSRF protection.
 - **Partial updates**: the applications tracker's status dropdown calls `PUT /api/applications/{id}` with only `{ status }` — the backend treats `PUT` as a deliberate partial update (see backend README) so this doesn't require resending the whole record.
 
-Status: Phase 7 complete — all pages wired to the live backend, verified via
-real browser interaction (register, dashboard, job analysis, matching,
-application tracking, profile editing all confirmed end-to-end).
+Status: Phases 7-9 complete — all pages wired to the live backend, verified
+via real browser interaction, with an automated test suite in place.

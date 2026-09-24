@@ -23,12 +23,28 @@ uvicorn app.main:app --reload
 
 API docs: http://localhost:8000/docs
 
-Running tests:
+## Testing
+
+Tests run against a dedicated `resume_analyzer_test` database (never the dev
+one) with `AI_MODE` forced to `mock`, so they need no API key. Create the
+test database once:
+
+```sql
+CREATE DATABASE resume_analyzer_test OWNER resume_user;
+```
+
+Then:
 
 ```bash
 pip install -r requirements-dev.txt
 pytest
 ```
+
+59 tests: model/schema structure, resume parsing, the mock AI provider and
+job-matching keyword logic, and full API-level tests (auth, resumes, jobs,
+matching, applications, dashboard) using `tests/fixtures/sample_resume.pdf`
+/ `.docx` and `sample_job_description.txt`. `tests/conftest.py` creates/drops
+tables per session and truncates all tables after every test for isolation.
 
 ## Structure
 

@@ -8,12 +8,12 @@ Built as a BTech 4th-year Computer Science portfolio project to demonstrate
 frontend, backend, database, auth, NLP/document processing, AI integration,
 and clean software architecture end to end.
 
-> **Status: Phases 0-8 complete** — database, auth, resume upload/parsing, AI
-> analysis, job matching, application tracking, and the full frontend are
-> implemented and verified end-to-end (backend: 25/25 automated tests +
-> live-API verification; frontend: real browser testing of every flow). Only
-> Phase 9 (formal frontend tests) and Phase 10 (final docs polish) remain —
-> see the roadmap below.
+> **Status: Phases 0-9 complete** — database, auth, resume upload/parsing, AI
+> analysis, job matching, application tracking, the full frontend, and an
+> automated test suite (59 backend + 15 frontend tests, all passing) are all
+> implemented and verified end-to-end. Phase 10 (a dedicated docs-polish
+> pass) was intentionally skipped — this README has been kept current after
+> every phase instead.
 
 ## Screenshots
 
@@ -129,6 +129,13 @@ GRANT ALL PRIVILEGES ON DATABASE resume_analyzer TO resume_user;
 Either way, Postgres ends up reachable at `localhost:5432` with credentials
 matching `backend/.env.example` (`resume_user` / `resume_pass` / `resume_analyzer`).
 
+If you also want to run the backend test suite, create one more (empty)
+database for it — tests never touch your real data:
+
+```sql
+CREATE DATABASE resume_analyzer_test OWNER resume_user;
+```
+
 ### Backend
 
 ```bash
@@ -161,6 +168,16 @@ npm run dev
 ```
 
 App: http://localhost:3000
+
+### Running tests
+
+```bash
+# Backend (needs resume_analyzer_test database, see above)
+cd backend && pip install -r requirements-dev.txt && pytest
+
+# Frontend
+cd frontend && npm run test
+```
 
 ## Environment variables
 
@@ -200,8 +217,8 @@ App: http://localhost:3000
 | 6 | ✅ Application tracker + dashboard stats |
 | 7 | ✅ Frontend build-out, wired to the real API |
 | 8 | ✅ Polish: loaders, empty/error states, toasts, confirm dialogs, responsive layout (built alongside Phase 7, not bolted on after) |
-| 9 | Tests (backend + frontend) |
-| 10 | Documentation pass |
+| 9 | ✅ Tests: 59 backend (pytest, isolated test DB) + 15 frontend (Vitest) |
+| 10 | Skipped by request — documentation is kept current phase-by-phase instead of as a separate pass |
 
 ## AI functionality
 

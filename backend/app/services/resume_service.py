@@ -53,7 +53,7 @@ def upload_resume(db: Session, user: User, file: UploadFile, title: str | None) 
             # corrupted file may still hold its handle open briefly. The orphaned
             # file is harmless — it's never referenced by any DB row.
             pass
-        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, str(exc)) from exc
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, str(exc)) from exc
 
     resume = Resume(
         user_id=user.id,

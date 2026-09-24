@@ -9,6 +9,7 @@ export function ScoreBar({ label, score }: { label: string; score: number }) {
       </div>
       <div className="h-2.5 w-full overflow-hidden rounded-full bg-muted">
         <div
+          data-testid="score-bar-fill"
           className={cn("h-full rounded-full transition-all", scoreBarColor(score))}
           style={{ width: `${Math.min(100, Math.max(0, score))}%` }}
         />

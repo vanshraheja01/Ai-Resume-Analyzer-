@@ -1,0 +1,12 @@
+Full Stack Developer - Acme Corp
+
+We are looking for a Full Stack Developer with experience in React, Node.js,
+Python, REST APIs, PostgreSQL and Docker. 3+ years of experience required.
+Bachelor degree in Computer Science or related field.
+
+Responsibilities:
+- Build and maintain web applications end to end
+- Collaborate with product and design teams
+- Write clean, tested, maintainable code
+
+Preferred: AWS, Redis, Kubernetes experience is a plus.
