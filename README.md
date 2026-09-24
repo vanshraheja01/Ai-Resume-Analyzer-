@@ -93,14 +93,26 @@ See [backend/README.md](backend/README.md) for column-level detail as models lan
 
 ### Database (PostgreSQL, no paid services)
 
+Two options — pick whichever you already have:
+
+**Option A — Docker** (if you have Docker Desktop running):
+
 ```bash
 docker compose up -d
 ```
 
-This starts Postgres on `localhost:5432` with credentials matching
-`backend/.env.example` (`resume_user` / `resume_pass` / `resume_analyzer`).
-Requires Docker Desktop — if you don't have it installed, get it from
-docker.com; there's no paid tier needed for local dev.
+**Option B — Native PostgreSQL for Windows/Mac/Linux** (no virtualization needed):
+Install from [postgresql.org/download](https://www.postgresql.org/download/),
+then create the app's role and database once, using the `postgres` superuser:
+
+```sql
+CREATE ROLE resume_user WITH LOGIN PASSWORD 'resume_pass' CREATEDB;
+CREATE DATABASE resume_analyzer OWNER resume_user;
+GRANT ALL PRIVILEGES ON DATABASE resume_analyzer TO resume_user;
+```
+
+Either way, Postgres ends up reachable at `localhost:5432` with credentials
+matching `backend/.env.example` (`resume_user` / `resume_pass` / `resume_analyzer`).
 
 ### Backend
 
@@ -118,6 +130,7 @@ venv\Scripts\activate
 ```bash
 pip install -r requirements.txt
 cp .env.example .env
+alembic upgrade head
 uvicorn app.main:app --reload
 ```
 
@@ -160,7 +173,7 @@ App: http://localhost:3000
 | Phase | Deliverable |
 |---|---|
 | 0 | ✅ Repo scaffolding, backend/frontend skeletons, docker-compose Postgres |
-| 1 | Database: SQLAlchemy models, Alembic migrations |
+| 1 | ✅ Database: SQLAlchemy models, Alembic migrations, applied to a live Postgres |
 | 2 | Auth: register/login/logout, JWT, password hashing |
 | 3 | Resume upload + parser (PyMuPDF/python-docx), storage abstraction |
 | 4 | AI resume analysis (provider abstraction + mock mode) |
