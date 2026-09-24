@@ -6,7 +6,6 @@ from pydantic import BaseModel, ConfigDict
 
 
 class ResumeSummary(BaseModel):
-    """Lightweight shape for list views — leaves out raw_text/parsed_data."""
 
     model_config = ConfigDict(from_attributes=True)
 

@@ -29,9 +29,6 @@ export default function ProfilePage() {
   );
 }
 
-// A separate component so its field state can be initialized directly from
-// `user` (a stable prop by the time this ever mounts, since the page above
-// only renders it once `user` is non-null) — no effect needed to sync state.
 function ProfileForm({ user, onSaved }: { user: User; onSaved: (user: User) => void }) {
   const [fullName, setFullName] = useState(user.full_name ?? "");
   const [location, setLocation] = useState(user.location ?? "");

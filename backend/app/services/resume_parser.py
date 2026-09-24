@@ -1,12 +1,3 @@
-"""Resume text extraction and structured field parsing.
-
-This is deliberately *not* AI-based — it's classic regex/heuristic NLP,
-resilient to different resume layouts but not perfect (a resume with an
-unusual structure may end up with some empty fields). The AI analysis layer
-(Phase 4) reasons over `raw_text` + this structured output; it doesn't
-replace this step, it builds on it.
-"""
-
 import re
 from pathlib import Path
 from typing import Any
@@ -16,7 +7,7 @@ import pymupdf
 
 
 class ResumeParsingError(Exception):
-    """Raised when a file can't be opened/read at all (corrupted, unsupported, empty)."""
+    pass
 
 
 def extract_text(file_path: Path, file_type: str) -> str:
@@ -31,7 +22,7 @@ def _extract_text_from_pdf(file_path: Path) -> str:
     try:
         with pymupdf.open(file_path) as document:
             text = "\n".join(page.get_text() for page in document)
-    except Exception as exc:  # PyMuPDF raises its own RuntimeError/ValueError on corrupt files
+    except Exception as exc:
         raise ResumeParsingError("Could not read this PDF - it may be corrupted or password-protected.") from exc
 
     if not text.strip():
@@ -54,8 +45,6 @@ def _extract_text_from_docx(file_path: Path) -> str:
         raise ResumeParsingError("No extractable text found in this document.")
     return text
 
-
-# --- Structured field extraction -------------------------------------------------
 
 EMAIL_RE = re.compile(r"[\w.+-]+@[\w-]+\.[\w.-]+")
 PHONE_RE = re.compile(r"(?:\+?\d{1,3}[\s.-]?)?\(?\d{2,4}\)?[\s.-]?\d{3,4}[\s.-]?\d{3,6}")
@@ -99,8 +88,7 @@ def _split_into_sections(lines: list[str]) -> dict[str, list[str]]:
 
 
 def _extract_name(lines: list[str]) -> str | None:
-    # Heuristic: the first non-empty line near the top that isn't contact info
-    # and isn't itself a section header. Resumes overwhelmingly lead with the name.
+
     for line in lines[:5]:
         candidate = line.strip()
         if not candidate:
@@ -115,7 +103,7 @@ def _extract_name(lines: list[str]) -> str | None:
 
 
 def _extract_location(lines: list[str]) -> str | None:
-    # Heuristic: a short "City, State"/"City, Country"-shaped line near the top.
+
     location_pattern = re.compile(r"^[A-Za-z .]+,\s*[A-Za-z .]+$")
     for line in lines[:8]:
         candidate = line.strip()
@@ -129,7 +117,7 @@ def _split_list_field(section_lines: list[str]) -> list[str]:
     for line in section_lines:
         parts = re.split(r"[,|]", line) if "," in line or "|" in line else [line]
         items.extend(p.strip() for p in parts if p.strip())
-    # De-duplicate while preserving order.
+
     seen: set[str] = set()
     deduped = []
     for item in items:
@@ -155,7 +143,7 @@ def parse_resume(raw_text: str) -> dict[str, Any]:
         "email": emails[0] if emails else None,
         "phone": next((p for p in phones if len(re.sub(r"\D", "", p)) >= 7), None),
         "location": _extract_location(non_empty_lines),
-        "links": list(dict.fromkeys(links)),  # de-duplicated, order preserved
+        "links": list(dict.fromkeys(links)),
         "education": sections["education"],
         "skills": _split_list_field(sections["skills"]),
         "experience": sections["experience"],

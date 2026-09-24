@@ -15,7 +15,7 @@ from app.utils.security import hash_password, verify_password
 
 settings = get_settings()
 
-# tokenUrl is only used to populate the "Authorize" flow in the /docs UI.
+
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
 
 _credentials_exception = HTTPException(

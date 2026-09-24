@@ -30,8 +30,8 @@ def test_update_is_partial(client: TestClient, auth_headers: dict):
     assert response.status_code == 200
     body = response.json()
     assert body["status"] == "interview"
-    assert body["notes"] == "Initial note"  # untouched by the partial update
-    assert body["company"] == "Acme Corp"  # untouched
+    assert body["notes"] == "Initial note"
+    assert body["company"] == "Acme Corp"
 
 
 def test_filter_by_status(client: TestClient, auth_headers: dict):
@@ -84,7 +84,7 @@ def test_dashboard_aggregates_correctly(client: TestClient, auth_headers: dict):
 
     stats = client.get("/api/dashboard", headers=auth_headers).json()
     assert stats["total_applications"] == 4
-    assert stats["interviews"] == 2  # interview + technical_round
+    assert stats["interviews"] == 2
     assert stats["offers"] == 1
-    assert stats["pending"] == 1  # applied
+    assert stats["pending"] == 1
     assert stats["by_status"]["saved"] == 0

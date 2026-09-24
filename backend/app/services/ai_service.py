@@ -1,11 +1,3 @@
-"""AI provider abstraction.
-
-Every caller depends only on `AIProvider` and `get_ai_provider()` — never on
-Gemini (or any other vendor) directly. Swapping providers, or running with
-no API key at all via `MockAIProvider`, means changing `AI_MODE`/`AI_PROVIDER`
-in `.env`; no route or service code changes.
-"""
-
 import json
 import re
 from abc import ABC, abstractmethod
@@ -16,7 +8,7 @@ from app.schemas.ai import JobAnalysisResult, MatchResult, ResumeAnalysisResult
 
 
 class AIProviderError(Exception):
-    """Raised when the AI provider fails or returns something we can't validate."""
+    pass
 
 
 class AIProvider(ABC):
@@ -47,16 +39,11 @@ _EXPERIENCE_YEARS_RE = re.compile(r"(\d+)\+?\s*(?:years?|yrs?)", re.IGNORECASE)
 
 
 def _contains_keyword(text: str, keyword: str) -> bool:
-    """Whole-keyword match using alphanumeric-adjacency lookarounds rather than `\\b`,
-    since `\\b` breaks on symbol-heavy keywords like "C++" or "CI/CD". Prevents false
-    positives like "SQL" matching inside "PostgreSQL" or "Java" inside "JavaScript"."""
     pattern = r"(?<![a-z0-9])" + re.escape(keyword.lower()) + r"(?![a-z0-9])"
     return re.search(pattern, text) is not None
 
 
 class MockAIProvider(AIProvider):
-    """Deterministic, content-aware scoring with zero external calls or API key.
-    Lets the whole app run and be demoed without any AI credentials."""
 
     def analyze_job(self, job_description: str) -> JobAnalysisResult:
         text_lower = job_description.lower()
@@ -96,8 +83,6 @@ class MockAIProvider(AIProvider):
         matched = [s for s in all_job_skills if s.lower() in resume_skills]
         unmatched = [s for s in all_job_skills if s.lower() not in resume_skills]
 
-        # Crude partial-match heuristic: the job skill's first "word root" shows up in
-        # some resume skill (e.g. job wants "Node.js", resume lists "Node").
         partial, missing = [], []
         for skill in unmatched:
             root = re.split(r"[.\s]", skill.lower())[0]
@@ -130,7 +115,7 @@ class MockAIProvider(AIProvider):
         projects_score = 85 if projects else 40
         education_score = 90 if education else 50
         structure_score = 78 if raw_text.strip() else 30
-        job_relevance_score = 70  # neutral — standalone resume analysis has no specific job to compare against; see match_resume_job for that
+        job_relevance_score = 70
         achievements_score = 82 if achievements else 45
         keywords_score = min(90, 40 + len(skills) * 5)
         overall_score = round(
@@ -254,7 +239,7 @@ Job requirements:
 
 class GeminiAIProvider(AIProvider):
     def __init__(self, api_key: str, model: str):
-        from google import genai  # imported lazily so `google-genai` is only required in live mode
+        from google import genai
 
         self._client = genai.Client(api_key=api_key)
         self._model = model
@@ -265,7 +250,7 @@ class GeminiAIProvider(AIProvider):
         from google.genai import types
 
         last_error: Exception | None = None
-        for _attempt in range(2):  # one retry if the model returns malformed/invalid JSON
+        for _attempt in range(2):
             try:
                 response = self._client.models.generate_content(
                     model=self._model,
@@ -274,7 +259,7 @@ class GeminiAIProvider(AIProvider):
                 )
                 data = json.loads(response.text)
                 return schema_cls.model_validate(data)
-            except Exception as exc:  # broad on purpose: API errors, bad JSON, and schema mismatches all just retry-then-fail
+            except Exception as exc:
                 last_error = exc
                 continue
 
@@ -283,7 +268,7 @@ class GeminiAIProvider(AIProvider):
     def analyze_resume(self, parsed_data: dict, raw_text: str) -> ResumeAnalysisResult:
         prompt = _RESUME_ANALYSIS_PROMPT.format(
             parsed_data=json.dumps(parsed_data, indent=2),
-            raw_text=raw_text[:6000],  # keep prompts bounded
+            raw_text=raw_text[:6000],
         )
         return self._generate_validated(prompt, ResumeAnalysisResult)
 

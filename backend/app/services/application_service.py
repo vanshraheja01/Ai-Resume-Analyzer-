@@ -11,8 +11,7 @@ from app.services import job_service, resume_service
 
 
 def _validate_linked_ids(db: Session, user: User, job_id: uuid.UUID | None, resume_id: uuid.UUID | None) -> None:
-    # Reuses the existing ownership-checked getters so a user can never link
-    # an application to another user's job or resume.
+
     if job_id is not None:
         job_service.get_job(db, user, job_id)
     if resume_id is not None:

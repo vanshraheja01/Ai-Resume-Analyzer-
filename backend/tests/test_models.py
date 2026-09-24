@@ -1,11 +1,4 @@
-"""Structural checks on the SQLAlchemy models — no live database needed.
-
-These verify the schema we designed (tables, columns, FKs, constraints) is
-what actually got registered on Base.metadata, catching typos/mistakes
-before we ever generate an Alembic migration against a real Postgres.
-"""
-
-from app import models  # noqa: F401  (populates Base.metadata as a side effect)
+from app import models
 from app.database.base import Base
 
 

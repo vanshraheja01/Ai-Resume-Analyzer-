@@ -1,6 +1,3 @@
-// Mirrors the backend Pydantic schemas (see backend/app/schemas/*.py) so the
-// frontend and API stay in lockstep as a single source of truth to update.
-
 export interface User {
   id: string;
   email: string;

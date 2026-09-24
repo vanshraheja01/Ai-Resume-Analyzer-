@@ -9,7 +9,7 @@ Preferred: AWS, Redis, Kubernetes experience is a plus.
 
 
 def test_contains_keyword_avoids_substring_false_positives():
-    # "SQL" must not match inside "PostgreSQL"; "Java" must not match inside "JavaScript".
+
     assert not _contains_keyword("experience with postgresql database", "sql")
     assert not _contains_keyword("javascript developer", "java")
     assert not _contains_keyword("good communication skills", "go")
@@ -49,12 +49,12 @@ def test_match_resume_job_identifies_matched_missing_and_partial():
 
     assert "React" in result.matched_skills
     assert "Python" in result.matched_skills
-    assert "Node.js" in result.partial_skills  # resume has "Node", job wants "Node.js"
+    assert "Node.js" in result.partial_skills
     assert "Docker" in result.missing_skills
     assert 0 <= result.match_score <= 100
 
 
 def test_match_resume_job_handles_empty_job_skills():
     result = MockAIProvider().match_resume_job({"skills": ["Python"]}, {})
-    assert result.match_score == 50  # neutral default when there's nothing to compare against
+    assert result.match_score == 50
     assert result.matched_skills == []

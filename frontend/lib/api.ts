@@ -48,7 +48,7 @@ async function request<T>(
 
   let requestBody: BodyInit | undefined;
   if (form) {
-    requestBody = form; // browser sets multipart Content-Type + boundary
+    requestBody = form;
   } else if (body !== undefined) {
     headers["Content-Type"] = "application/json";
     requestBody = JSON.stringify(body);
@@ -78,8 +78,6 @@ async function request<T>(
 
   return data as T;
 }
-
-// --- Auth ---------------------------------------------------------------
 
 export const authApi = {
   register: (data: { email: string; password: string; full_name?: string }) =>
@@ -111,8 +109,6 @@ export const authApi = {
   }) => request<User>("/api/auth/me", { method: "PUT", body: data }),
 };
 
-// --- Resumes --------------------------------------------------------------
-
 export const resumesApi = {
   upload: (file: File, title?: string) => {
     const form = new FormData();
@@ -127,8 +123,6 @@ export const resumesApi = {
   analyses: (id: string) => request<ResumeAnalysis[]>(`/api/resumes/${id}/analyses`),
 };
 
-// --- Jobs -------------------------------------------------------------------
-
 export const jobsApi = {
   analyze: (data: { title: string; company?: string; description_raw: string; job_url?: string }) =>
     request<Job>("/api/jobs/analyze", { method: "POST", body: data }),
@@ -139,14 +133,10 @@ export const jobsApi = {
 
 export type { JobExtractedData };
 
-// --- Matching -----------------------------------------------------------
-
 export const matchingApi = {
   analyze: (resumeId: string, jobId: string) =>
     request<Match>("/api/matching/analyze", { method: "POST", body: { resume_id: resumeId, job_id: jobId } }),
 };
-
-// --- Applications -------------------------------------------------------
 
 export interface ApplicationInput {
   company: string;
@@ -168,8 +158,6 @@ export const applicationsApi = {
     request<Application>(`/api/applications/${id}`, { method: "PUT", body: data }),
   remove: (id: string) => request<void>(`/api/applications/${id}`, { method: "DELETE" }),
 };
-
-// --- Dashboard ------------------------------------------------------------
 
 export const dashboardApi = {
   get: () => request<DashboardStats>("/api/dashboard"),

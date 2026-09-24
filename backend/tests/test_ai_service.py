@@ -49,7 +49,7 @@ def test_resume_analysis_result_rejects_out_of_range_scores():
 
     with pytest.raises(ValidationError):
         ResumeAnalysisResult(
-            overall_score=150,  # out of range
+            overall_score=150,
             skills_score=50,
             experience_score=50,
             projects_score=50,

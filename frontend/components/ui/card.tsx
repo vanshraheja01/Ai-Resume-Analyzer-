@@ -14,7 +14,6 @@ export function Card({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
   );
 }
 
-/** Same as Card, plus a lift-on-hover/press affordance for clickable cards (links, list items). */
 export function InteractiveCard({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
   return (
     <Card

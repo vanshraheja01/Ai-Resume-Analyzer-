@@ -49,9 +49,7 @@ def upload_resume(db: Session, user: User, file: UploadFile, title: str | None) 
         try:
             storage.delete(key)
         except OSError:
-            # Best-effort cleanup: on Windows, a library that failed to parse a
-            # corrupted file may still hold its handle open briefly. The orphaned
-            # file is harmless — it's never referenced by any DB row.
+
             pass
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, str(exc)) from exc
 

@@ -4,20 +4,11 @@ import { useEffect, useRef, useState, type ElementType, type ReactNode } from "r
 
 interface ScrollRevealProps {
   children: ReactNode;
-  /** Stagger index — each step adds ~80ms of delay. Use the item's position in a list. */
   index?: number;
   className?: string;
   as?: ElementType;
 }
 
-/**
- * Fades/slides/blurs children into view the first time they cross into the
- * viewport. Always starts hidden (matches SSR, which has no `window`) and
- * flips to visible client-side — never decide the initial state from
- * `window`/`IntersectionObserver` at module scope, or the server-rendered
- * HTML and the client's first render disagree and React throws a hydration
- * mismatch.
- */
 export function ScrollReveal({ children, index = 0, className, as: Tag = "div" }: ScrollRevealProps) {
   const ref = useRef<HTMLElement | null>(null);
   const [visible, setVisible] = useState(false);
@@ -27,8 +18,6 @@ export function ScrollReveal({ children, index = 0, className, as: Tag = "div" }
     if (!node) return;
 
     if (typeof IntersectionObserver === "undefined") {
-      // Ancient-browser fallback — defer so this isn't a synchronous
-      // setState call inside the effect body.
       const raf = requestAnimationFrame(() => setVisible(true));
       return () => cancelAnimationFrame(raf);
     }

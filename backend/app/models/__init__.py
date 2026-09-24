@@ -1,6 +1,3 @@
-"""Import every model here so Base.metadata is fully populated for Alembic
-autogenerate and so relationship() string references resolve correctly."""
-
 from app.models.application import Application, ApplicationStatus
 from app.models.job import Job
 from app.models.match import Match

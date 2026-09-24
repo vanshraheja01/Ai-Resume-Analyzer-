@@ -1,11 +1,3 @@
-"""Storage abstraction for uploaded files.
-
-Every route/service talks to `StorageBackend`, never to the filesystem (or,
-later, S3/Supabase Storage) directly. `Resume.file_path` stores whatever
-opaque key the active backend hands back — swapping backends later means
-adding one class here and changing `get_storage_backend()`, nothing else.
-"""
-
 import uuid
 from abc import ABC, abstractmethod
 from functools import lru_cache
@@ -17,15 +9,15 @@ from app.config import get_settings
 class StorageBackend(ABC):
     @abstractmethod
     def save(self, content: bytes, original_filename: str) -> str:
-        """Persist file content, returning an opaque key to retrieve it later."""
+        pass
 
     @abstractmethod
     def get_path(self, key: str) -> Path:
-        """Return a local filesystem path the file's bytes can be read from."""
+        pass
 
     @abstractmethod
     def delete(self, key: str) -> None:
-        """Remove the stored file. Must not raise if it's already gone."""
+        pass
 
 
 class LocalStorageBackend(StorageBackend):
@@ -52,5 +44,5 @@ def get_storage_backend() -> StorageBackend:
     settings = get_settings()
     if settings.storage_backend == "local":
         return LocalStorageBackend(settings.local_storage_path)
-    # Future: elif settings.storage_backend == "s3": return S3StorageBackend(...)
+
     raise ValueError(f"Unsupported STORAGE_BACKEND: {settings.storage_backend}")

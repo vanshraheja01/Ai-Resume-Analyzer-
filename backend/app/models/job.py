@@ -25,7 +25,7 @@ class Job(Base):
     title: Mapped[str] = mapped_column(String(255), nullable=False)
     company: Mapped[str | None] = mapped_column(String(255))
     description_raw: Mapped[str] = mapped_column(Text, nullable=False)
-    # required_skills, preferred_skills, experience_years, education, tools, keywords
+
     extracted_data: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
     job_url: Mapped[str | None] = mapped_column(String(1000))
 

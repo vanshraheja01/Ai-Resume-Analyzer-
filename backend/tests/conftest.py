@@ -1,10 +1,3 @@
-"""Shared pytest fixtures for API-level tests.
-
-Uses a dedicated `resume_analyzer_test` Postgres database (never the dev
-database) so tests can freely create/delete rows. AI_MODE is forced to
-"mock" so these tests never need a real API key or make network calls.
-"""
-
 import os
 import shutil
 import tempfile
@@ -25,7 +18,7 @@ from app.config import get_settings
 get_settings.cache_clear()
 settings = get_settings()
 
-from app import models  # noqa: E402,F401  (registers all tables on Base.metadata)
+from app import models
 from app.database.base import Base
 from app.database.connection import get_db
 from app.main import app
@@ -76,7 +69,6 @@ def client():
 
 @pytest.fixture
 def auth_headers(client: TestClient):
-    """Registers a fresh user and returns headers ready for authenticated requests."""
     email = "fixture-user@example.com"
     password = "testpass123"
     client.post("/api/auth/register", json={"email": email, "password": password, "full_name": "Fixture User"})

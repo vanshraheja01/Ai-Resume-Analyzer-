@@ -24,11 +24,11 @@ class Resume(Base):
 
     title: Mapped[str] = mapped_column(String(255), nullable=False)
     file_path: Mapped[str] = mapped_column(String(1000), nullable=False)
-    file_type: Mapped[str] = mapped_column(String(10), nullable=False)  # "pdf" | "docx"
+    file_type: Mapped[str] = mapped_column(String(10), nullable=False)
     file_size: Mapped[int] = mapped_column(Integer, nullable=False)
 
     raw_text: Mapped[str | None] = mapped_column(Text)
-    parsed_data: Mapped[dict[str, Any] | None] = mapped_column(JSONB)  # name, email, phone, education, skills, ...
+    parsed_data: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
 
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
@@ -43,8 +43,6 @@ class Resume(Base):
 
 
 class ResumeAnalysis(Base):
-    """One row per AI analysis run — kept as history rather than overwritten,
-    so a resume's score progress over time can be shown."""
 
     __tablename__ = "resume_analyses"
 

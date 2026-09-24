@@ -14,8 +14,6 @@ if TYPE_CHECKING:
 
 
 class Match(Base):
-    """Result of running the AI matching engine on one (resume, job) pair.
-    Re-running a match on the same pair should update this row, not duplicate it."""
 
     __tablename__ = "matches"
     __table_args__ = (UniqueConstraint("resume_id", "job_id", name="uq_resume_job_match"),)

@@ -18,8 +18,6 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  // Only "loading" if there's a stored token to verify — avoids a synchronous
-  // setState-in-effect for the (very common) logged-out case.
   const [loading, setLoading] = useState(() => !!getToken());
 
   useEffect(() => {
@@ -62,7 +60,6 @@ export function useAuth(): AuthContextValue {
   return ctx;
 }
 
-/** Redirects to /login if the user isn't authenticated once the initial auth check settles. */
 export function useRequireAuth(): AuthContextValue {
   const auth = useAuth();
   const router = useRouter();

@@ -19,9 +19,6 @@ class ApplicationCreate(BaseModel):
 
 
 class ApplicationUpdate(BaseModel):
-    """All fields optional — PUT is treated as a partial update here (only
-    fields explicitly sent are changed), which matches how a real tracker UI
-    edits one field at a time (e.g. dragging a card to change status)."""
 
     company: str | None = Field(default=None, min_length=1, max_length=255)
     position_title: str | None = Field(default=None, min_length=1, max_length=255)

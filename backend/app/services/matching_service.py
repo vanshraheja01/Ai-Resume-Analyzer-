@@ -11,8 +11,7 @@ from app.services.ai_service import AIProviderError, get_ai_provider
 
 
 def match_resume_to_job(db: Session, user: User, resume_id: uuid.UUID, job_id: uuid.UUID) -> Match:
-    # Ownership is enforced by these two calls (each 404s on a resume/job the user doesn't
-    # own), so a match can never be created across two different users' data.
+
     resume = resume_service.get_resume(db, user, resume_id)
     job = job_service.get_job(db, user, job_id)
 

@@ -17,7 +17,7 @@ def register(data: UserRegister, db: Session = Depends(get_db)) -> User:
 
 @router.post("/login", response_model=TokenResponse)
 def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)) -> TokenResponse:
-    # OAuth2PasswordRequestForm expects "username" — the frontend sends the user's email in that field.
+
     user = auth_service.authenticate_user(db, form_data.username, form_data.password)
     access_token = auth_service.create_access_token(user.id)
     return TokenResponse(access_token=access_token)

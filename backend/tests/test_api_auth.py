@@ -92,6 +92,5 @@ def test_update_profile_persists_fields(client: TestClient, auth_headers: dict):
     assert body["location"] == "Remote"
     assert body["preferred_role"] == "Backend Engineer"
 
-    # Confirm it actually persisted, not just echoed back.
     me = client.get("/api/auth/me", headers=auth_headers)
     assert me.json()["location"] == "Remote"
