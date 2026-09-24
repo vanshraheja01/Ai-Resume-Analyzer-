@@ -128,5 +128,22 @@ alembic upgrade head
   match can only ever be created between one user's own resume and their own job description.
 
 Status: Phase 5 complete (job analysis, matching engine, upsert semantics).
-Application tracking and the frontend land in later phases — see the root
-README for the roadmap.
+
+## Application tracking & dashboard
+
+- **Applications** (`app/models/application.py`, `app/services/application_service.py`): full CRUD
+  behind auth, with `job_id`/`resume_id` optional but ownership-checked when present — you can track
+  an application with no stored job/resume behind it, but you can never link to someone else's.
+- **`PUT` as partial update**: `ApplicationUpdate` has every field optional, and the service applies
+  only `model_dump(exclude_unset=True)` — this matches how a Kanban-style UI actually edits one field
+  at a time (e.g. dragging a card just changes `status`), rather than requiring a full resend of every
+  field on every edit. A documented deliberate deviation from strict REST `PUT` semantics.
+- **Dashboard** (`GET /api/dashboard`, `app/services/dashboard_service.py`): aggregates `by_status`
+  counts across all seven `ApplicationStatus` values, plus headline `interviews` (interview +
+  technical_round), `offers`, and `pending` (applied, awaiting a response) numbers, alongside resume
+  and job counts — everything the spec's dashboard mockup (`Applications 42 / Interviews 8 / Offers 2 /
+  Pending 17`) needs in one call.
+
+Status: Phase 6 complete — the entire backend (Phases 0-6) is implemented,
+tested, and verified end-to-end. The frontend build-out is next — see the
+root README for the roadmap.

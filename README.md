@@ -182,7 +182,7 @@ App: http://localhost:3000
 | 3 | ✅ Resume upload + parser (PyMuPDF/python-docx), storage abstraction |
 | 4 | ✅ AI resume analysis (Gemini + mock provider abstraction) |
 | 5 | ✅ Job description analyzer + resume-job matching engine |
-| 6 | Application tracker + stats |
+| 6 | ✅ Application tracker + dashboard stats |
 | 7 | Frontend build-out, wired to the real API |
 | 8 | Polish: loaders, empty/error states, responsive pass |
 | 9 | Tests (backend + frontend) |
@@ -212,6 +212,34 @@ malformed reply. Every response — mock or live — is validated against the
 same `ResumeAnalysisResult` Pydantic schema before it's stored or returned;
 a response that doesn't fit raises `AIProviderError`, which the API layer
 turns into a clean `502` rather than a crash or a corrupted DB row.
+
+## API endpoints
+
+All routes except register/login require a `Authorization: Bearer <token>` header.
+Interactive docs (request/response schemas, "Try it out") live at `/docs`.
+
+| Method | Path | Purpose |
+|---|---|---|
+| POST | `/api/auth/register` | Create an account |
+| POST | `/api/auth/login` | Get a JWT (form-encoded `username`/`password`) |
+| GET | `/api/auth/me` | Current user's profile |
+| POST | `/api/resumes/upload` | Upload + parse a PDF/DOCX resume |
+| GET | `/api/resumes` | List the user's resumes |
+| GET | `/api/resumes/{id}` | Resume detail, incl. parsed data |
+| DELETE | `/api/resumes/{id}` | Delete a resume |
+| POST | `/api/resumes/{id}/analyze` | Run AI scoring, returns a new analysis |
+| GET | `/api/resumes/{id}/analyses` | Analysis history for a resume |
+| POST | `/api/jobs/analyze` | Submit a JD, get it stored + AI-extracted |
+| GET | `/api/jobs` | List analyzed job descriptions |
+| GET | `/api/jobs/{id}` | Job detail |
+| DELETE | `/api/jobs/{id}` | Delete a job |
+| POST | `/api/matching/analyze` | Match a resume against a job |
+| GET | `/api/applications` | List tracked applications (`?status=` filter) |
+| POST | `/api/applications` | Track a new application |
+| GET | `/api/applications/{id}` | Application detail |
+| PUT | `/api/applications/{id}` | Partial update (status, notes, dates, ...) |
+| DELETE | `/api/applications/{id}` | Delete a tracked application |
+| GET | `/api/dashboard` | Aggregate stats across applications/resumes/jobs |
 
 ## Future improvements
 

@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import auth, jobs, matching, resumes
+from app.api import applications, auth, dashboard, jobs, matching, resumes
 from app.config import get_settings
 
 settings = get_settings()
@@ -24,6 +24,8 @@ app.include_router(auth.router)
 app.include_router(resumes.router)
 app.include_router(jobs.router)
 app.include_router(matching.router)
+app.include_router(applications.router)
+app.include_router(dashboard.router)
 
 
 @app.get("/")
